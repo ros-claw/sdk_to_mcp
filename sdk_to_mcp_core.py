@@ -1312,7 +1312,7 @@ This MCP server was auto-generated from SDK sources. To regenerate:
 
 - **SDK Issues:** Refer to [{metadata.doc_url}]({metadata.doc_url})
 - **MCP Protocol:** https://modelcontextprotocol.io
-- **ROSClaw Project:** https://github.com/ruvnet/rosclaw
+- **ROSClaw Project:** https://github.com/ros-claw
 
 ## License
 

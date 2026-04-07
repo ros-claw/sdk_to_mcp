@@ -594,6 +594,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 **Made with ❤️ for the ROS and AI communities**
 
-*[ROSClaw Project](https://github.com/ruvnet/rosclaw) - Agent-Agnostic Embodied Intelligence Middleware*
+*[ROSClaw Project](https://github.com/ros-claw) - Agent-Agnostic Embodied Intelligence Middleware*
 
 </div>
