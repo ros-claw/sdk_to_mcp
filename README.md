@@ -1,5 +1,7 @@
 # SDK-to-MCP: Hardware SDK to MCP Server Converter
 
+🌐 **English** | [中文](./README.zh.md)
+
 <div align="center">
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
