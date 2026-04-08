@@ -35,6 +35,15 @@ from typing import Dict, List, Optional, Tuple, Any, Set
 from enum import Enum, auto
 from datetime import datetime
 
+# New V2.0 modules for Self-Healing, ROS2 parsing, and Asset Bundle generation
+try:
+    from .self_healing_generator import SelfHealingGenerator, HealingResult
+    from .ros2_interface_parser import ROS2InterfaceParser, ROS2MessageDefinition
+    from .asset_bundle import AssetBundleGenerator, AssetBundle
+    V2_MODULES_AVAILABLE = True
+except ImportError:
+    V2_MODULES_AVAILABLE = False
+
 
 class CommunicationProtocol(Enum):
     """Supported communication protocols."""
@@ -1445,5 +1454,180 @@ if __name__ == "__main__":
     #     metadata=metadata,
     # )
 
-    print("SDK to MCP Transformer loaded successfully")
+    print("SDK to MCP Transformer V2.0 loaded successfully")
+    print("New features: Self-Healing Generator, ROS2 Interface Parser, Asset Bundle")
     print("Use transform_sdk_to_mcp() to convert an SDK")
+
+
+# =============================================================================
+# V2.0 Extension Methods for SDKToMCPTransformer
+# =============================================================================
+
+def _extend_transformer_with_v2_methods():
+    """Add V2.0 methods to SDKToMCPTransformer class."""
+
+    def transform_sdk_with_self_healing(
+        self,
+        metadata: 'SDKMetadata',
+        sdk_path: Path,
+        output_path: Path,
+        llm_generator=None,
+        max_attempts: int = 5,
+    ) -> Dict[str, Any]:
+        """
+        Transform SDK using self-healing code generation (V2.0).
+
+        This method generates MCP server code iteratively, testing and
+        fixing errors automatically until the code passes all checks.
+
+        Args:
+            metadata: SDK metadata
+            sdk_path: Path to SDK directory
+            output_path: Where to generate output
+            llm_generator: Function for LLM code generation
+            max_attempts: Maximum healing attempts
+
+        Returns:
+            Dictionary with generated files and healing results
+        """
+        if not V2_MODULES_AVAILABLE:
+            raise ImportError(
+                "V2.0 modules not available. "
+                "Please install: self_healing_generator, asset_bundle"
+            )
+
+        self.logger.info(f"V2.0 Self-Healing Transform: {metadata.name}")
+
+        # First, run standard extraction
+        protocol_info = self._extract_protocol_info(sdk_path, metadata)
+        safety_constraints = self._extract_safety_constraints(sdk_path, metadata)
+        hardware_specs = self._extract_hardware_specs(sdk_path, metadata)
+
+        # Extract ROS2 interfaces if applicable
+        if metadata.protocol in [CommunicationProtocol.ROS, CommunicationProtocol.ROS2]:
+            ros2_parser = ROS2InterfaceParser(ros2_available=False)
+            interface_summary = ros2_parser.extract_interface_summary(sdk_path)
+            protocol_info['ros2_interfaces'] = interface_summary
+
+        # Generate initial server code
+        initial_code = self._generate_mcp_server_code(
+            metadata, protocol_info, safety_constraints
+        )
+
+        # Apply self-healing if LLM generator provided
+        if llm_generator:
+            from .self_healing_generator import SelfHealingGenerator
+
+            healer = SelfHealingGenerator(llm_generator)
+            healing_result = healer.generate(
+                prompt=initial_code,
+                max_attempts=max_attempts,
+            )
+
+            if healing_result.success:
+                final_code = healing_result.final_code
+            else:
+                # Fall back to initial code
+                final_code = initial_code
+                self.logger.warning("Self-healing failed, using initial code")
+        else:
+            final_code = initial_code
+            healing_result = None
+
+        # Generate Asset Bundle
+        bundle_generator = AssetBundleGenerator()
+        bundle = bundle_generator.generate(
+            robot_id=metadata.name,
+            robot_name=metadata.name.replace("_", " ").title(),
+            server_code=final_code,
+            hardware_specs=hardware_specs.to_dict() if hasattr(hardware_specs, 'to_dict') else {},
+            protocol_info=protocol_info,
+            safety_constraints=[c.to_dict() if hasattr(c, 'to_dict') else c for c in safety_constraints],
+        )
+
+        # Validate bundle
+        is_valid, errors = bundle.validate()
+        if not is_valid:
+            self.logger.warning(f"Bundle validation warnings: {errors}")
+
+        # Write to output
+        files = bundle.to_output_dir(output_path)
+
+        result = {
+            'files': files,
+            'bundle': bundle,
+            'healing_result': healing_result,
+            'valid': is_valid,
+        }
+
+        self.logger.info(f"V2.0 Transform complete: {len(files)} files")
+        return result
+
+    def generate_asset_bundle(
+        self,
+        metadata: 'SDKMetadata',
+        server_code: str,
+        output_path: Path,
+    ) -> AssetBundle:
+        """
+        Generate complete Asset Bundle from existing server code (V2.0).
+
+        Args:
+            metadata: SDK metadata
+            server_code: Generated MCP server Python code
+            output_path: Where to write bundle files
+
+        Returns:
+            AssetBundle with all generated components
+        """
+        if not V2_MODULES_AVAILABLE:
+            raise ImportError("asset_bundle module not available")
+
+        # Extract specs
+        hardware_specs = self.hardware_specs.get(metadata.name, {})
+        protocol_info = {'protocol_type': metadata.protocol.name}
+        safety_constraints = self.safety_constraints.get(metadata.name, [])
+
+        # Generate bundle
+        generator = AssetBundleGenerator()
+        bundle = generator.generate(
+            robot_id=metadata.name,
+            robot_name=metadata.name.replace("_", " ").title(),
+            server_code=server_code,
+            hardware_specs=hardware_specs.to_dict() if hasattr(hardware_specs, 'to_dict') else {},
+            protocol_info=protocol_info,
+            safety_constraints=[c.to_dict() if hasattr(c, 'to_dict') else c for c in safety_constraints],
+        )
+
+        # Write files
+        bundle.to_output_dir(output_path)
+
+        return bundle
+
+    def parse_ros2_interfaces(
+        self,
+        sdk_path: Path,
+    ) -> Dict[str, Any]:
+        """
+        Parse ROS2 interfaces from SDK directory (V2.0).
+
+        Args:
+            sdk_path: Path to SDK directory
+
+        Returns:
+            Dictionary with parsed messages, services, topics
+        """
+        if not V2_MODULES_AVAILABLE:
+            raise ImportError("ros2_interface_parser module not available")
+
+        parser = ROS2InterfaceParser(ros2_available=False)
+        return parser.extract_interface_summary(sdk_path)
+
+    # Attach methods to class
+    SDKToMCPTransformer.transform_sdk_with_self_healing = transform_sdk_with_self_healing
+    SDKToMCPTransformer.generate_asset_bundle = generate_asset_bundle
+    SDKToMCPTransformer.parse_ros2_interfaces = parse_ros2_interfaces
+
+
+# Initialize V2.0 extensions
+_extend_transformer_with_v2_methods()
