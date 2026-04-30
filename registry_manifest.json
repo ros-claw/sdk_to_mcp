@@ -1,0 +1,122 @@
+{
+  "schema_version": "2.0",
+  "last_updated": "2026-04-29T01:24:32.613685",
+  "total_robots": 1,
+  "categories": {
+    "arm": {
+      "count": 0,
+      "robots": []
+    },
+    "mobile": {
+      "count": 1,
+      "robots": [
+        "unitree_unitree_go2"
+      ]
+    },
+    "humanoid": {
+      "count": 0,
+      "robots": []
+    },
+    "drone": {
+      "count": 0,
+      "robots": []
+    }
+  },
+  "robots": {
+    "unitree_unitree_go2": {
+      "identity": {
+        "name": "unitree_go2",
+        "display_name": "Unitree Unitree Go2",
+        "vendor": "Unitree",
+        "type": "mobile",
+        "ros_version": "humble"
+      },
+      "metadata": {
+        "description": "",
+        "version": "1.0.0",
+        "author": "ROSClaw Team",
+        "license": "Apache-2.0"
+      },
+      "links": {
+        "github": "https://github.com/ros-claw/rosclaw_unitree_go2_mcp",
+        "docs": "",
+        "pypi": "rosclaw-unitree_go2-mcp"
+      },
+      "technical": {
+        "mcp_tools": [
+          {
+            "name": "walk",
+            "description": "Walk to target",
+            "parameters": [],
+            "returns": {},
+            "is_async": true,
+            "has_firewall": true,
+            "is_preemptible": false
+          },
+          {
+            "name": "stand_up",
+            "description": "Stand up",
+            "parameters": [],
+            "returns": {},
+            "is_async": true,
+            "has_firewall": true,
+            "is_preemptible": false
+          },
+          {
+            "name": "get_battery",
+            "description": "Get battery",
+            "parameters": [],
+            "returns": {},
+            "is_async": true,
+            "has_firewall": false,
+            "is_preemptible": false
+          }
+        ],
+        "ros2_interfaces": [],
+        "safety_constraints": [
+          {
+            "type": "velocity",
+            "min": 0.0,
+            "max": 1.5,
+            "unit": "m/s",
+            "description": ""
+          },
+          {
+            "type": "position",
+            "min": -0.8,
+            "max": 0.8,
+            "unit": "rad",
+            "description": ""
+          }
+        ],
+        "firewall": {
+          "enabled": true,
+          "safety_level": "STRICT",
+          "mujoco_model": "",
+          "collision_pairs": [],
+          "validation_rules": [
+            "Check joint limits before execution",
+            "Validate velocity constraints",
+            "Ensure collision-free trajectory"
+          ]
+        }
+      },
+      "capabilities": {
+        "async": true,
+        "preemption": true,
+        "tf2": true,
+        "firewall": true
+      },
+      "status": {
+        "state": "beta",
+        "added": "2026-04-29T01:24:32.613634",
+        "updated": "2026-04-29T01:24:32.613638"
+      }
+    }
+  },
+  "statistics": {
+    "total_mcp_tools": 3,
+    "total_safety_constraints": 2,
+    "firewall_coverage": 100.0
+  }
+}

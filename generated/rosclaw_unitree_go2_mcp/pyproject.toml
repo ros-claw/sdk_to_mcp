@@ -1,0 +1,89 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rosclaw_unitree_go2_mcp"
+version = "1.0.0"
+description = "ROSClaw-Native MCP Server for Unitree unitree_go2"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "ROSClaw Team", email = "contact@rosclaw.org"},
+]
+keywords = [
+    "ros2",
+    "mobile",
+    "navigation",
+    "mcp",
+    "robotics",
+    "rosclaw",
+    "embodied-ai",
+    "unitree",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Robotics",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "rclpy>=3.0.0",
+    "geometry-msgs",
+    "sensor-msgs",
+    "std-msgs",
+    "tf2-ros",
+    "rosclaw-firewall>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+]
+
+[project.scripts]
+rosclaw_unitree_go2_mcp = "rosclaw_unitree_go2_mcp.server:mcp.run"
+
+[project.urls]
+Homepage = "https://github.com/ros-claw/rosclaw_unitree_go2_mcp"
+Documentation = "https://docs.rosclaw.org/rosclaw_unitree_go2_mcp"
+Repository = "https://github.com/ros-claw/rosclaw_unitree_go2_mcp"
+Issues = "https://github.com/ros-claw/rosclaw_unitree_go2_mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rosclaw_unitree_go2_mcp"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"

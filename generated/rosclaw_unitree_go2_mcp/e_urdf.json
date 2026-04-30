@@ -1,0 +1,29 @@
+{
+  "version": "2.0",
+  "robot": {
+    "name": "unitree_go2",
+    "vendor": "Unitree",
+    "type": "mobile"
+  },
+  "digital_twin": {
+    "mujoco_model": "",
+    "urdf": ""
+  },
+  "kinematics": {
+    "joint_limits": {},
+    "velocity_limits": {}
+  },
+  "safety": {
+    "limits": {},
+    "collision_pairs": []
+  },
+  "ros2_interfaces": {
+    "action_servers": [],
+    "services": [],
+    "topics": []
+  },
+  "mcp_server": {
+    "name": "rosclaw_unitree_go2_mcp",
+    "tools": []
+  }
+}
